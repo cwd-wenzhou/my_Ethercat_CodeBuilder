@@ -22,6 +22,7 @@ ec_pdo_info_t MOTOR_pdos[] = {// RxPdo
         {0x1600, 5, MOTOR_pdo_entries + 0},
         // TxPdo
         {0x1a00, 5, MOTOR_pdo_entries + 5}};
+        
 ec_sync_info_t MOTOR_syncs[] = {{0, EC_DIR_OUTPUT, 0, nullptr,        EC_WD_DISABLE},
                                 {1, EC_DIR_INPUT,  0, nullptr,        EC_WD_DISABLE},
                                 {2, EC_DIR_OUTPUT, 1, MOTOR_pdos + 0, EC_WD_DISABLE},
