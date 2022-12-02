@@ -81,16 +81,7 @@ ec_sync_info_t *EL3064::get_ec_sync_info_t_() {
 }
 
 ec_pdo_entry_reg_t *EL3064::Domain_regs(uint16_t position, uint32_t vendor_id, uint32_t product_code) {
-    unsigned int *bit_position0 = (unsigned int *) new int(0);
-    unsigned int *bit_position1 = (unsigned int *) new int(1);
-    unsigned int *bit_position2 = (unsigned int *) new int(2);
-    unsigned int *bit_position3 = (unsigned int *) new int(3);
-    unsigned int *bit_position4 = (unsigned int *) new int(4);
-    unsigned int *bit_position5 = (unsigned int *) new int(5);
-    unsigned int *bit_position6 = (unsigned int *) new int(6);
-    unsigned int *bit_position7 = (unsigned int *) new int(7);
     auto *ans = new ec_pdo_entry_reg_t[33]{
-            // alias,position,vender ID,Product_code,index,subindex,offset,bit_position
             {0, position, vendor_id, product_code, 0x6000, 1,  &pdo_offset.offset_6000[0], bit_position0},
             {0, position, vendor_id, product_code, 0x6000, 2,  &pdo_offset.offset_6000[0], bit_position1},
             {0, position, vendor_id, product_code, 0x6000, 3,  &pdo_offset.offset_6000[0], bit_position2},

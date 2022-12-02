@@ -29,7 +29,7 @@ class MyEthercatCodeBuilderApplicationTests {
 //                        "Beckhoff EL1xxx.xml");
         Element targetDevice = myPraser.getTargetElement("#xbf83052",
                 "#x140000",
-                "/home/cwd/Documents/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
+                "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
                         "Beckhoff EL30xx.xml");
         assert targetDevice != null;
         String className = targetDevice.element("Type").getStringValue();
@@ -44,10 +44,14 @@ class MyEthercatCodeBuilderApplicationTests {
         String entiresAssemble = myAssembler.entiresAssemble(className, rxPdos, txPdos);
         String pdosAssemble = myAssembler.pdosAssemble(className, rxPdos, txPdos);
         String syncAssemble = myAssembler.syncAssemble(className, rxPdos, txPdos);
-        String syncInfoAssemble = myAssembler.syncInfoAssemble(className, rxPdos, txPdos);
+        String syncInfoAssemble = myAssembler.syncInfoAssemble(className);
+        String domainRegsAssemble = myAssembler.domainRegsAssemble(className, rxPdos, txPdos);
+        String configAssemble = myAssembler.configAssemble(className);
         System.out.println(entiresAssemble);
         System.out.println(pdosAssemble);
         System.out.println(syncAssemble);
         System.out.println(syncInfoAssemble);
+        System.out.println(domainRegsAssemble);
+        System.out.println(configAssemble);
     }
 }
