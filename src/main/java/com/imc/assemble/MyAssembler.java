@@ -1,5 +1,6 @@
 package com.imc.assemble;
 
+import com.imc.model.BitCount;
 import com.imc.model.Entry;
 import com.imc.model.Pdo;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Service
 public class MyAssembler {
+    int count;
     public String entiresAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
         StringBuilder res = new StringBuilder("ec_pdo_entry_info_t " + className + "_pdo_entries[] = {\n");
         for (Pdo pdo : rxPdos) {
@@ -27,14 +29,13 @@ public class MyAssembler {
                         append(entry.getBitLen()).append("},//").
                         append(entry.getName()).append("\n");
             }
-        }
-        res.append("};\n");
+        }        res.append("};\n");
         return res.toString();
     }
 
     public String pdosAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
         String entriesName = className + "_pdo_entries";
-        int count = 0;
+        count = 0;
         String res = "ec_pdo_info_t " + className + "_pdos[] = {\n";
         for (Pdo pdo : rxPdos) {
             res += "    {"+pdo.getIndex()+", "+pdo.getEntries().size()+", "+entriesName+" + "+count+"},\n";
@@ -78,5 +79,32 @@ public class MyAssembler {
         return "ec_sync_info_t *"+className+"::get_ec_sync_info_t_() {\n" +
                 "    return "+className+"_syncs;\n}\n";
     }
+
+    public String domainRegsAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos){
+        String res = "ec_pdo_entry_reg_t *"+className+"::Domain_regs(uint16_t position, uint32_t vendor_id, uint32_t product_code) {\n"
+                +"auto *ans = new ec_pdo_entry_reg_t["+count+"]{\n";
+        String lastIndex = null;
+        BitCount bitCount = new BitCount();
+        for (Pdo pdo : rxPdos) {
+            for (Entry entry : pdo.getEntries()){
+                if (entry.getIndex().equals(lastIndex)){
+                    bitCount.addBit(Integer.parseInt(entry.getBitLen()));
+                }
+                else {
+                    bitCount = new BitCount();
+                    lastIndex = entry.getIndex();
+                }
+                res+="{0, position, vendor_id, product_code, "+entry.getIndex()+", "+entry.getSubindex()+", &pdo_offset.offset_"+
+                        entry.getIndex().substring(2,5)+"["+
+            }
+
+        }
+
+
+        return res;
+
+    }
+
+
 
 }
