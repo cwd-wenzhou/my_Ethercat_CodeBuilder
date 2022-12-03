@@ -42,19 +42,19 @@ public class MyPraser {
         if (!pdoElement.getName().equals(pdoType)) {
             return null;
         }
-        Pdo txPdo = new Pdo();
-        txPdo.setIndex(pdoElement.element("Index").getStringValue().replace("#", "0"));
-        txPdo.setName(pdoElement.element("Name").getStringValue().replace(" ", "_"));
-        txPdo.setExclude(new ArrayList<>());
-        txPdo.setEntries(new ArrayList<>());
+        Pdo pdo = new Pdo();
+        pdo.setIndex(pdoElement.element("Index").getStringValue().replace("#", "0"));
+        pdo.setName(pdoType+"_"+pdoElement.element("Name").getStringValue().replace(" ", "_"));
+        pdo.setExclude(new ArrayList<>());
+        pdo.setEntries(new ArrayList<>());
         for (Element exclude : pdoElement.elements("Exclude")) {
-            txPdo.getExclude().add(exclude.getStringValue().replace("#", "0"));
+            pdo.getExclude().add(exclude.getStringValue().replace("#", "0"));
         }
 
         for (Element entry : pdoElement.elements("Entry")) {
-            txPdo.getEntries().add(praseEntry(entry));
+            pdo.getEntries().add(praseEntry(entry));
         }
-        return txPdo;
+        return pdo;
     }
 
 
