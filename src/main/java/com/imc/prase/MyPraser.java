@@ -1,6 +1,7 @@
 package com.imc.prase;
 
 
+import com.imc.model.DataType;
 import com.imc.model.Entry;
 import com.imc.model.Pdo;
 import org.dom4j.Document;
@@ -22,7 +23,6 @@ public class MyPraser {
         Element root = doc.getRootElement();
         Element descriptions = root.element("Descriptions");
         Element devices = descriptions.element("Devices");
-        List<Element> devicesList = devices.elements();
         for (Element device : devices.elements()) {
             Element type = device.element("Type");
             if (productCode.equals(type.attribute("ProductCode").getValue()) &&
@@ -34,9 +34,9 @@ public class MyPraser {
     }
 
     /**
-     * @param pdoElement
+     * @param pdoElement pdoElement
      * @param pdoType    "TxPdo" OR " RxPdo"
-     * @return
+     * @return 解析完成的pdo
      */
     public Pdo prasePdo(Element pdoElement, String pdoType) {
         if (!pdoElement.getName().equals(pdoType)) {
@@ -44,7 +44,7 @@ public class MyPraser {
         }
         Pdo txPdo = new Pdo();
         txPdo.setIndex(pdoElement.element("Index").getStringValue().replace("#", "0"));
-        txPdo.setName(pdoElement.element("Name").getStringValue());
+        txPdo.setName(pdoElement.element("Name").getStringValue().replace(" ", "_"));
         txPdo.setExclude(new ArrayList<>());
         txPdo.setEntries(new ArrayList<>());
         for (Element exclude : pdoElement.elements("Exclude")) {
@@ -78,14 +78,14 @@ public class MyPraser {
         if (name == null) {
             entry.setName(null);
         } else {
-            entry.setName(name.getStringValue());
+            entry.setName(name.getStringValue().replace(" ", "_"));
         }
 
         Element dataType = entryElement.element("DataType");
         if (dataType == null) {
-            entry.setDataType("0");
+            entry.setDataType(DataType.getDataTypeBytypeString("0"));
         } else {
-            entry.setDataType(dataType.getStringValue());
+            entry.setDataType(DataType.getDataTypeBytypeString(dataType.getStringValue()));
         }
         return entry;
     }

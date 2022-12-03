@@ -2,12 +2,12 @@ package com.imc.my_ethercat_codebuilder;
 
 import com.imc.assemble.MyAssembler;
 import com.imc.model.Pdo;
+import com.imc.prase.MyPraser;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.imc.prase.MyPraser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,5 +53,7 @@ class MyEthercatCodeBuilderApplicationTests {
         System.out.println(syncInfoAssemble);
         System.out.println(domainRegsAssemble);
         System.out.println(configAssemble);
+
+
     }
 }

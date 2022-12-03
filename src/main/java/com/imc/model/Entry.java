@@ -8,5 +8,5 @@ public class Entry {
     String subindex;
     String bitLen;
     String name;
-    String dataType;
+    DataType dataType;
 }

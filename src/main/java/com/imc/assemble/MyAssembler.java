@@ -139,4 +139,8 @@ public class MyAssembler {
                 "}\n";
         return res;
     }
+
+    public String readDataAssemble(String classname, List<Pdo> rxPdos){
+        return "";
+    }
 }
