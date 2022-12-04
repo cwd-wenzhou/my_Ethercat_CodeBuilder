@@ -16,10 +16,25 @@ import java.util.List;
 
 @Service
 public class MyPraser {
+    public String prase(String productCode, String revisionNo, String fliePath, List<Pdo> rxPdos, List<Pdo> txPdos ){
+        Element targetDevice = getTargetElement(productCode,revisionNo,fliePath);
+        assert targetDevice != null;
+        targetDevice.elements("TxPdo").forEach(pdo -> txPdos.add(prasePdo(pdo, "TxPdo")));
+        targetDevice.elements("RxPdo").forEach(pdo -> rxPdos.add(prasePdo(pdo, "RxPdo")));
+        excludePdo(rxPdos);
+        excludePdo(txPdos);
+        return targetDevice.element("Type").getStringValue().replace("-","_");
+    }
 
-    public Element getTargetElement(String productCode, String revisionNo, String fliePath) throws DocumentException {
+    public Element getTargetElement(String productCode, String revisionNo, String fliePath){
         SAXReader saxReader = new SAXReader();
-        Document doc = saxReader.read(fliePath);
+        Document doc = null;
+        try {
+            doc = saxReader.read(fliePath);
+        } catch (DocumentException e) {
+            System.out.println("NO FILE!");
+            throw new RuntimeException(e);
+        }
         Element root = doc.getRootElement();
         Element descriptions = root.element("Descriptions");
         Element devices = descriptions.element("Devices");
