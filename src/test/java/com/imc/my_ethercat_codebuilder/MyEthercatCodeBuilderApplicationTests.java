@@ -1,6 +1,7 @@
 package com.imc.my_ethercat_codebuilder;
 
 import com.imc.assemble.MyAssembler;
+import com.imc.assemble.MyconfigAssembler;
 import com.imc.model.Pdo;
 import com.imc.prase.MyPraser;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ class MyEthercatCodeBuilderApplicationTests {
 
     @Autowired
     MyAssembler myAssembler;
+
+    @Autowired
+    MyconfigAssembler myconfigAssembler;
 
     @Test
     void contextLoads() throws IOException {
@@ -48,13 +52,14 @@ class MyEthercatCodeBuilderApplicationTests {
         String source = myAssembler.assembleSource(className, rxPdos, txPdos);
         String header = myAssembler.assembleHeader(className, rxPdos, txPdos);
 
-
         String sourceFilePath = "/home/imc/Documents/ethercat/Ethercat-server-control/src/slaves/" + className + ".cpp";
         String headerFilePath = "/home/imc/Documents/ethercat/Ethercat-server-control/src/slaves/include/" + className + ".h";
-
+        String configCppPath = "/home/imc/Documents/ethercat/Ethercat-server-control/src/slaves/config.cpp";
         Files.write(Paths.get(sourceFilePath), source.getBytes());
         Files.write(Paths.get(headerFilePath), header.getBytes());
 
+
+        myconfigAssembler.editConfigFile(configCppPath,productCode,className);
 //        System.out.println(source);
 //        System.out.println(header);
 

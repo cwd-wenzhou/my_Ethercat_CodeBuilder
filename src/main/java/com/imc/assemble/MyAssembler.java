@@ -65,4 +65,5 @@ public class MyAssembler {
                 + mySourceAssembler.destructorAssemble(className);
         return res;
     }
+
 }
