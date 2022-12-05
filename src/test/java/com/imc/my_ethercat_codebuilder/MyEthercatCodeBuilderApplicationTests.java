@@ -24,20 +24,20 @@ class MyEthercatCodeBuilderApplicationTests {
 
     @Test
     void contextLoads() throws IOException {
-        String productCode = "#x01";
-        String revisionNo = "#x00001";
-        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-                "Maxsine_EP3E_EC_V01_11.xml";
-
-
-//        String productCode = "#x03f03052";
-//        String revisionNo = "#xx00100000";
-//        String filePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
+//        String productCode = "#x01";
+//        String revisionNo = "#x00001";
+//        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
 //                "Maxsine_EP3E_EC_V01_11.xml";
+
+
+        String productCode = "#x03f03052";
+        String revisionNo = "#x00100000";
+        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
+                "Beckhoff EL1xxx.xml";
 
 //        String productCode = "#xbf83052";
 //        String revisionNo = "#x140000";
-//        String filePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
+//        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
 //                        "Beckhoff EL30xx.xml";
 
 
@@ -55,8 +55,8 @@ class MyEthercatCodeBuilderApplicationTests {
         Files.write(Paths.get(sourceFilePath), source.getBytes());
         Files.write(Paths.get(headerFilePath), header.getBytes());
 
-        System.out.println(source);
-        System.out.println(header);
+//        System.out.println(source);
+//        System.out.println(header);
 
     }
 }

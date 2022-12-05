@@ -122,18 +122,18 @@ public class MySourceAssembler {
     public String configAssemble(String className) {
         String res = "";
         res += "void " + className + "::config(int position) {\n" +
-                "    std::string txpdo_name = \"" + className + "_TxPDO_\";\n" +
+                "    std::string txpdo_name = \"" + className + "_TxPdo_\";\n" +
                 "    txpdo_name.append(std::to_string(position));\n" +
                 "    int fd = shm_open(txpdo_name.c_str(), O_CREAT | O_RDWR, 0666);\n" +
-                "    ftruncate(fd, sizeof(" + className + "_TxPDO));\n" +
-                "    " + className.toLowerCase() + "TxPdo = (" + className + "_TxPDO *) mmap(nullptr, sizeof(" + className + "_TxPDO), PROT_WRITE, MAP_SHARED, fd, 0);\n" +
+                "    ftruncate(fd, sizeof(" + className + "_TxPdo));\n" +
+                "    " + className.toLowerCase() + "TxPdo = (" + className + "_TxPdo *) mmap(nullptr, sizeof(" + className + "_TxPdo), PROT_WRITE, MAP_SHARED, fd, 0);\n" +
                 "    printf(\"  mmap to %s\\n\", txpdo_name.c_str());\n" +
                 "\n" +
-                "    std::string rxpdo_name = \"" + className + "_RxPDO_\";\n" +
+                "    std::string rxpdo_name = \"" + className + "_RxPdo_\";\n" +
                 "    rxpdo_name.append(std::to_string(position));\n" +
                 "    fd = shm_open(rxpdo_name.c_str(), O_CREAT | O_RDWR, 0666);\n" +
-                "    ftruncate(fd, sizeof(" + className + "_RxPDO));\n" +
-                "    " + className.toLowerCase() + "RxPdo = (" + className + "_RxPDO *) mmap(nullptr, sizeof(" + className + "_RxPDO), PROT_WRITE|PROT_WRITE, MAP_SHARED, fd, 0);\n" +
+                "    ftruncate(fd, sizeof(" + className + "_RxPdo));\n" +
+                "    " + className.toLowerCase() + "RxPdo = (" + className + "_RxPdo *) mmap(nullptr, sizeof(" + className + "_RxPdo), PROT_WRITE|PROT_WRITE, MAP_SHARED, fd, 0);\n" +
                 "    printf(\"  mmap to %s\\n\", rxpdo_name.c_str());\n" +
                 "}\n";
         return res;
@@ -232,8 +232,8 @@ public class MySourceAssembler {
 
     public String destructorAssemble(String className){
         return className+"::~"+className+"() {\n" +
-                "    munmap("+className.toLowerCase()+"RxPdo, sizeof("+className+"_RxPDO));\n"+
-                "    munmap("+className.toLowerCase()+"TxPdo, sizeof("+className+"_TxPDO));\n"+
+                "    munmap("+className.toLowerCase()+"RxPdo, sizeof("+className+"_RxPdo));\n"+
+                "    munmap("+className.toLowerCase()+"TxPdo, sizeof("+className+"_TxPdo));\n"+
                 "}";
     }
 

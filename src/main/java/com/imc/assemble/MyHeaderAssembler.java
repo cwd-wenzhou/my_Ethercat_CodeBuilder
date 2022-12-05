@@ -13,9 +13,18 @@ import java.util.Objects;
 public class MyHeaderAssembler {
     public String offsetAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
         String res = "struct " + className + "_PDO_OFFSET {\n";
+        res += offsetAssemble_help(rxPdos);
+        res += offsetAssemble_help(txPdos);
+        res += "};\n";
+        return res;
+    }
+
+    public String offsetAssemble_help(List<Pdo> pdos) {
+        StringBuilder res = new StringBuilder();
         BitCount bitCount = new BitCount();
         String lastIndex = null;
-        for (Pdo pdo : rxPdos) {
+        int size = 0;
+        for (Pdo pdo : pdos) {
             for (Entry entry : pdo.getEntries()) {
                 if (Objects.equals(entry.getIndex(), "0x0")) {
                     bitCount.addBit(Integer.parseInt(entry.getBitLen()));
@@ -23,11 +32,11 @@ public class MyHeaderAssembler {
                 }
                 if (!entry.getIndex().equals(lastIndex)) {
                     if (lastIndex != null) {
-                        int size = bitCount.getBit();
+                         size = bitCount.getBit();
                         if (bitCount.getOffset() > 0) {
                             size++;
                         }
-                        res += "    unsigned int offset_" + lastIndex.substring(2, 6) + "[" + size + "];\n";
+                        res.append("    unsigned int offset_").append(lastIndex, 2, 6).append("[").append(size).append("];\n");
                     }
                     bitCount = new BitCount();
                 }
@@ -35,9 +44,12 @@ public class MyHeaderAssembler {
                 lastIndex = entry.getIndex();
             }
         }
-        res += "};\n";
-        return res;
+        if (lastIndex!=null){
+            res.append("    unsigned int offset_").append(lastIndex, 2, 6).append("[").append(size).append("];\n");
+        }
+        return res.toString();
     }
+
 
     public String pdoClassAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
         String res = pdoClassAssemble_help(className + "_TxPdo", txPdos);
@@ -46,43 +58,48 @@ public class MyHeaderAssembler {
     }
 
     private String pdoClassAssemble_help(String pdoName, List<Pdo> pdos) {
-        String res = "class " + pdoName + " {\n" + "public:\n";
+        StringBuilder res = new StringBuilder("class " + pdoName + " {\n" + "public:\n");
         for (Pdo pdo : pdos) {
-            res += "    //" + pdo.getIndex() + "\n";
+            res.append("    //").append(pdo.getIndex()).append("\n");
             for (Entry entry : pdo.getEntries()) {
                 if (entry.getDataType().isBits()) {
-                    res += "    bool " + pdo.getName() + "_" + entry.getName() + "[" + entry.getDataType().getXmlString().charAt(3) + "]\n";
-                } else if (entry.getDataType().equals(DataType.UNkonw)) {
-                    continue;
-                } else {
-                    res += "    " + entry.getDataType().getTypeString() + " " + pdo.getName() + "_" + entry.getName() + ";\n";
+                    res.append("    bool ").append(pdo.getName()).append("_").append(entry.getName()).append("[").append(entry.getDataType().getXmlString().charAt(3)).append("]\n");
+                } else if (!entry.getDataType().equals(DataType.UNkonw)) {
+                    res.append("    ").append(entry.getDataType().getTypeString()).append(" ").append(pdo.getName()).append("_").append(entry.getName()).append(";\n");
                 }
             }
 
         }
-        res += "}\n";
-        return res;
+        res.append("};\n");
+        return res.toString();
     }
 
     public String classAssemble(String className) {
         return "class " + className + " : public SLAVE {\n" +
                 "public:\n" +
-                "    " + className + "TxPdo *" + className.toLowerCase() + "Txpdo;\n" +
-                "    " + className + "RxPdo *" + className.toLowerCase() + "Rxpdo;\n" +
-                "    struct " + className + "_PDO_OFFSET pdo_offset;\nvoid config(int position) override;\n" +
+                "    " + className + "_TxPdo *" + className.toLowerCase() + "TxPdo;\n" +
+                "    " + className + "_RxPdo *" + className.toLowerCase() + "RxPdo;\n" +
+                "    struct " + className + "_PDO_OFFSET pdo_offset;\n    void config(int position) override;\n" +
+                "\n" +
                 "    void read_data() override;\n" +
+                "\n" +
                 "    void write_data() override;\n" +
+                "\n" +
                 "    void process_data() override;\n" +
+                "\n" +
                 "    void print() override;\n" +
+                "\n" +
                 "    ec_pdo_entry_reg_t *Domain_regs(uint16_t position, uint32_t vendor_id, uint32_t product_code) override;\n" +
+                "\n" +
                 "    ec_sync_info_t *get_ec_sync_info_t_() override;\n" +
+                "\n" +
                 "    ~" + className + "() override;\n" +
                 "};\n";
     }
 
     public String externAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
         int entriesCount = 0;
-        int pdosCount = rxPdos.size()+txPdos.size();
+        int pdosCount = rxPdos.size() + txPdos.size();
         for (Pdo pdo : rxPdos) {
             for (Entry entry : pdo.getEntries()) {
                 if (!Objects.equals(entry.getIndex(), "0x0")) {
@@ -90,8 +107,15 @@ public class MyHeaderAssembler {
                 }
             }
         }
-        return "extern ec_pdo_entry_info_t EL3064_pdo_entries[" + entriesCount + "];\n" +
-                "extern ec_pdo_info_t EL3064_pdos[" + pdosCount + "];\n" +
-                "extern ec_sync_info_t EL3064_syncs[5];\n";
+        for (Pdo pdo : txPdos) {
+            for (Entry entry : pdo.getEntries()) {
+                if (!Objects.equals(entry.getIndex(), "0x0")) {
+                    entriesCount++;
+                }
+            }
+        }
+        return "extern ec_pdo_entry_info_t "+className+"_pdo_entries[" + entriesCount + "];\n" +
+                "extern ec_pdo_info_t "+className+"_pdos[" + pdosCount + "];\n" +
+                "extern ec_sync_info_t "+className+"_syncs[5];\n";
     }
 }

@@ -29,11 +29,12 @@ public class MyAssembler {
                 " *\n" +
                 " * Copyright (c) 2022 by cwd-wenzhou 619715109@qq.com, All Rights Reserved.\n" +
                 " */\n"+
-                "#ifndef ETHERCAT_SERVER_CONTROL_"+className+"_H\"\n"+
-                "#define ETHERCAT_SERVER_CONTROL_"+className+"_H\"\n\n"+
+                "#ifndef ETHERCAT_SERVER_CONTROL_"+className+"_H\n"+
+                "#define ETHERCAT_SERVER_CONTROL_"+className+"_H\n\n"+
                 "#include \"../../include/slave.h\"\n\n";
 
         res+=myHeaderAssembler.offsetAssemble(className,rxPdos,txPdos);
+        res+=myHeaderAssembler.pdoClassAssemble(className,rxPdos,txPdos);
         res+=myHeaderAssembler.classAssemble(className);
         res+=myHeaderAssembler.externAssemble(className,rxPdos,txPdos);
         res+="\n#endif // ETHERCAT_SERVER_CONTROL_"+className+"_H";
@@ -50,7 +51,7 @@ public class MyAssembler {
                 " *\n" +
                 " * Copyright (c) 2022 by cwd-wenzhou 619715109@qq.com, All Rights Reserved.\n" +
                 " */\n"+
-                "#include \"include/"+className+".h\n\n";
+                "#include \"include/"+className+".h\"\n\n";
         res += mySourceAssembler.entiresAssemble(className, rxPdos, txPdos)
                 + mySourceAssembler.pdosAssemble(className, rxPdos, txPdos)
                 + mySourceAssembler.syncAssemble(className, rxPdos, txPdos)
