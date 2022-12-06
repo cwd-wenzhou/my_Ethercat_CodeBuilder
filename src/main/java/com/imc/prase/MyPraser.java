@@ -2,6 +2,7 @@ package com.imc.prase;
 
 
 import com.imc.model.DataType;
+import com.imc.model.Direction;
 import com.imc.model.Entry;
 import com.imc.model.Pdo;
 import org.dom4j.Document;
@@ -16,9 +17,10 @@ import java.util.List;
 
 @Service
 public class MyPraser {
-    public String prase(String productCode, String revisionNo, String fliePath, List<Pdo> rxPdos, List<Pdo> txPdos ){
+    public String prase(String productCode, String revisionNo, String fliePath, List<Pdo> rxPdos, List<Pdo> txPdos , List<Direction> directions){
         Element targetDevice = getTargetElement(productCode,revisionNo,fliePath);
         assert targetDevice != null;
+        targetDevice.elements("Sm").forEach(sm->directions.add(Direction.getInstance(sm.getStringValue())));
         targetDevice.elements("TxPdo").forEach(pdo -> txPdos.add(prasePdo(pdo, "TxPdo")));
         targetDevice.elements("RxPdo").forEach(pdo -> rxPdos.add(prasePdo(pdo, "RxPdo")));
         excludePdo(rxPdos);

@@ -13,7 +13,7 @@ public class MyconfigAssembler {
 
     public String switchAssemble(String productCode, String className) {
         return "        case " + productCode.replace("#", "0") + ":\n" +
-                "            printf(\"  config as " + className + " Device!\\n\");\n" +
+                "            printf(\" config as " + className + " Device!\\n\");\n" +
                 "            pslave = new " + className + ";\n" +
                 "            break;\n";
     }

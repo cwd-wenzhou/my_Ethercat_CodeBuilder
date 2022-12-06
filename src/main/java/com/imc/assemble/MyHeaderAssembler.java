@@ -1,9 +1,6 @@
 package com.imc.assemble;
 
-import com.imc.model.BitCount;
-import com.imc.model.DataType;
-import com.imc.model.Entry;
-import com.imc.model.Pdo;
+import com.imc.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +29,7 @@ public class MyHeaderAssembler {
                 }
                 if (!entry.getIndex().equals(lastIndex)) {
                     if (lastIndex != null) {
-                         size = bitCount.getBit();
+                        size = bitCount.getBit();
                         if (bitCount.getOffset() > 0) {
                             size++;
                         }
@@ -44,7 +41,7 @@ public class MyHeaderAssembler {
                 lastIndex = entry.getIndex();
             }
         }
-        if (lastIndex!=null){
+        if (lastIndex != null) {
             res.append("    unsigned int offset_").append(lastIndex, 2, 6).append("[").append(size).append("];\n");
         }
         return res.toString();
@@ -63,7 +60,7 @@ public class MyHeaderAssembler {
             res.append("    //").append(pdo.getIndex()).append("\n");
             for (Entry entry : pdo.getEntries()) {
                 if (entry.getDataType().isBits()) {
-                    res.append("    bool ").append(pdo.getName()).append("_").append(entry.getName()).append("[").append(entry.getDataType().getXmlString().charAt(3)).append("]\n");
+                    res.append("    bool ").append(pdo.getName()).append("_").append(entry.getName()).append("[").append(entry.getDataType().getXmlString().charAt(3)).append("];\n");
                 } else if (!entry.getDataType().equals(DataType.UNkonw)) {
                     res.append("    ").append(entry.getDataType().getTypeString()).append(" ").append(pdo.getName()).append("_").append(entry.getName()).append(";\n");
                 }
@@ -97,25 +94,18 @@ public class MyHeaderAssembler {
                 "};\n";
     }
 
-    public String externAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
+    public String externAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos, List<Direction> directions) {
         int entriesCount = 0;
         int pdosCount = rxPdos.size() + txPdos.size();
+        int syncCount = directions.size()+1;
         for (Pdo pdo : rxPdos) {
-            for (Entry entry : pdo.getEntries()) {
-                if (!Objects.equals(entry.getIndex(), "0x0")) {
-                    entriesCount++;
-                }
-            }
+            entriesCount += pdo.getEntries().size();
         }
         for (Pdo pdo : txPdos) {
-            for (Entry entry : pdo.getEntries()) {
-                if (!Objects.equals(entry.getIndex(), "0x0")) {
-                    entriesCount++;
-                }
-            }
+            entriesCount += pdo.getEntries().size();
         }
-        return "extern ec_pdo_entry_info_t "+className+"_pdo_entries[" + entriesCount + "];\n" +
-                "extern ec_pdo_info_t "+className+"_pdos[" + pdosCount + "];\n" +
-                "extern ec_sync_info_t "+className+"_syncs[5];\n";
+        return "extern ec_pdo_entry_info_t " + className + "_pdo_entries[" + entriesCount + "];\n" +
+                "extern ec_pdo_info_t " + className + "_pdos[" + pdosCount + "];\n" +
+                "extern ec_sync_info_t " + className + "_syncs["+syncCount+"];\n";
     }
 }

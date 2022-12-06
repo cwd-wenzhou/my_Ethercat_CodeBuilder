@@ -2,6 +2,7 @@ package com.imc.my_ethercat_codebuilder;
 
 import com.imc.assemble.MyAssembler;
 import com.imc.assemble.MyconfigAssembler;
+import com.imc.model.Direction;
 import com.imc.model.Pdo;
 import com.imc.prase.MyPraser;
 import org.junit.jupiter.api.Test;
@@ -34,23 +35,24 @@ class MyEthercatCodeBuilderApplicationTests {
 //                "Maxsine_EP3E_EC_V01_11.xml";
 
 
-        String productCode = "#x03f03052";
-        String revisionNo = "#x00100000";
-        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-                "Beckhoff EL1xxx.xml";
-
-//        String productCode = "#xbf83052";
-//        String revisionNo = "#x140000";
+//        String productCode = "#x03f03052";
+//        String revisionNo = "#x00110000";
 //        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-//                        "Beckhoff EL30xx.xml";
+//                "Beckhoff EL1xxx.xml";
+
+        String productCode = "#xbf83052";
+        String revisionNo = "#x140000";
+        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
+                        "Beckhoff EL30xx.xml";
 
 
         List<Pdo> rxPdos = new ArrayList<>();
         List<Pdo> txPdos = new ArrayList<>();
-        String className = myPraser.prase(productCode, revisionNo, xmlfilePath, rxPdos, txPdos);
+        List<Direction> directions = new ArrayList<>();
+        String className = myPraser.prase(productCode, revisionNo, xmlfilePath, rxPdos, txPdos, directions);
 
-        String source = myAssembler.assembleSource(className, rxPdos, txPdos);
-        String header = myAssembler.assembleHeader(className, rxPdos, txPdos);
+        String source = myAssembler.assembleSource(className, rxPdos, txPdos,directions);
+        String header = myAssembler.assembleHeader(className, rxPdos, txPdos,directions);
 
         String sourceFilePath = "/home/imc/Documents/ethercat/Ethercat-server-control/src/slaves/" + className + ".cpp";
         String headerFilePath = "/home/imc/Documents/ethercat/Ethercat-server-control/src/slaves/include/" + className + ".h";
@@ -59,7 +61,7 @@ class MyEthercatCodeBuilderApplicationTests {
         Files.write(Paths.get(headerFilePath), header.getBytes());
 
 
-        myconfigAssembler.editConfigFile(configCppPath,productCode,className);
+        myconfigAssembler.editConfigFile(configCppPath, productCode, className);
 //        System.out.println(source);
 //        System.out.println(header);
 

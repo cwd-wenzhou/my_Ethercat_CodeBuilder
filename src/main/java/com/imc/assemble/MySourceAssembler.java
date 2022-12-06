@@ -1,9 +1,6 @@
 package com.imc.assemble;
 
-import com.imc.model.BitCount;
-import com.imc.model.DataType;
-import com.imc.model.Entry;
-import com.imc.model.Pdo;
+import com.imc.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,27 +50,24 @@ public class MySourceAssembler {
         return res;
     }
 
-    public String syncAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
+    public String syncAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos, List<Direction> directions) {
         String pdoName = className + "_pdos";
-        String res = "ec_sync_info_t " + className + "_syncs[] = {\n" +
-                "    {0, EC_DIR_OUTPUT, 0, nullptr, EC_WD_DISABLE},\n" +
-                "    {1, EC_DIR_INPUT,  0, nullptr, EC_WD_DISABLE},\n" +
-                "    {2, EC_DIR_OUTPUT, ";
-        if (rxPdos.size() == 0) {
-            res += "0, nullptr";
-        } else {
-            res += rxPdos.size() + ", " + pdoName + " + 0";
+        String res = "ec_sync_info_t " + className + "_syncs[] = {\n";
+        int sizeCount = 0;
+        for (int i = 0; i < directions.size(); i++) {
+            switch (directions.get(i)) {
+                case Inputs -> {
+                    res += "    {" + i + " , " + directions.get(i).getSourceFileString() + " , " + txPdos.size() + ", " + pdoName + " + " + sizeCount + ", EC_WD_DISABLE},\n";
+                    sizeCount += txPdos.size();
+                }
+                case Outputs -> {
+                    res += "    {" + i + " , " + directions.get(i).getSourceFileString() + " , " + rxPdos.size() + ", " + pdoName + " + " + sizeCount + ", EC_WD_DISABLE},\n";
+                    sizeCount += rxPdos.size();
+                }
+                default -> res += "    {" + i + ", "+directions.get(i).getSourceFileString()+",  0, nullptr, EC_WD_DISABLE},\n";
+            }
         }
-        res += ",EC_WD_DISABLE},\n" +
-                "    {3, EC_DIR_INPUT,  ";
-
-        if (txPdos.size() == 0) {
-            res += "0, nullptr";
-        } else {
-            res += txPdos.size() + ", " + pdoName + " + " + rxPdos.size();
-        }
-
-        res += ", EC_WD_DISABLE},\n    {0xff}};\n";
+        res += "    {0xff}};\n";
         return res;
     }
 
@@ -230,44 +224,45 @@ public class MySourceAssembler {
         return res;
     }
 
-    public String destructorAssemble(String className){
-        return className+"::~"+className+"() {\n" +
-                "    munmap("+className.toLowerCase()+"RxPdo, sizeof("+className+"_RxPdo));\n"+
-                "    munmap("+className.toLowerCase()+"TxPdo, sizeof("+className+"_TxPdo));\n"+
+    public String destructorAssemble(String className) {
+        return className + "::~" + className + "() {\n" +
+                "    munmap(" + className.toLowerCase() + "RxPdo, sizeof(" + className + "_RxPdo));\n" +
+                "    munmap(" + className.toLowerCase() + "TxPdo, sizeof(" + className + "_TxPdo));\n" +
                 "}";
     }
 
-    public String printAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos){
-        String res="void "+className+"::print() {\n" +
+    public String printAssemble(String className, List<Pdo> rxPdos, List<Pdo> txPdos) {
+        String res = "void " + className + "::print() {\n" +
                 "    std::cout << \"=====================================================\" << std::endl";
-        res+=printAssemble_help(className.toLowerCase()+"RxPdo",rxPdos);
-        res+=printAssemble_help(className.toLowerCase()+"TxPdo",txPdos);
-        res+=";\n}\n";
+        res += printAssemble_help(className.toLowerCase() + "RxPdo", rxPdos);
+        res += printAssemble_help(className.toLowerCase() + "TxPdo", txPdos);
+        res += ";\n}\n";
         return res;
     }
 
-    private String printAssemble_help(String pdoVarName, List<Pdo> pdos){
-        String res="";
+    private String printAssemble_help(String pdoVarName, List<Pdo> pdos) {
+        String res = "";
         for (Pdo pdo : pdos) {
             for (Entry entry : pdo.getEntries()) {
                 if (entry.getDataType().isBits()) {
                     int num = Integer.parseInt(entry.getDataType().getXmlString().substring(3, 4));
                     for (int i = 0; i < num; i++) {
-                        res += "\n    << \"  "  + pdo.getName() + "_" + entry.getName()+"["+i+"]: \" <<"+
-                                pdoVarName + "->" + pdo.getName() + "_" + entry.getName() +"["+i+"] << std::endl";
+                        res += "\n    << \"  " + pdo.getName() + "_" + entry.getName() + "[" + i + "]: \" <<" +
+                                pdoVarName + "->" + pdo.getName() + "_" + entry.getName() + "[" + i + "] << std::endl";
                     }
                 } else if (entry.getDataType().equals(DataType.UNkonw)) {
                 } else {
-                    res += "\n    << \"  "  + pdo.getName() + "_" + entry.getName()+" \" <<"+
-                            pdoVarName + "->" + pdo.getName() + "_" + entry.getName() +" << std::endl";
+                    res += "\n    << \"  " + pdo.getName() + "_" + entry.getName() + " \" <<" +
+                            pdoVarName + "->" + pdo.getName() + "_" + entry.getName() + " << std::endl";
                 }
             }
 
         }
         return res;
     }
-    public String processAssemble(String className){
-        return "void "+className+"::process_data() {\n" +
+
+    public String processAssemble(String className) {
+        return "void " + className + "::process_data() {\n" +
                 "#ifdef PRINT_DATA\n" +
                 "    static int count = 1;\n" +
                 "    count++;\n" +
