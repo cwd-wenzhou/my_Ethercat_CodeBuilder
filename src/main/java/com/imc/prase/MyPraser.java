@@ -11,42 +11,57 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
 public class MyPraser {
-    public String prase(String productCode, String revisionNo, String fliePath, List<Pdo> rxPdos, List<Pdo> txPdos , List<Direction> directions){
-        Element targetDevice = getTargetElement(productCode,revisionNo,fliePath);
+    public String prase(String name, String productCode, String revisionNo, String fliePath, List<Pdo> rxPdos, List<Pdo> txPdos, List<Direction> directions) {
+        Element targetDevice = getTargetElement(name, productCode, revisionNo, fliePath);
         assert targetDevice != null;
-        targetDevice.elements("Sm").forEach(sm->directions.add(Direction.getInstance(sm.getStringValue())));
+        targetDevice.elements("Sm").forEach(sm -> directions.add(Direction.getInstance(sm.getStringValue())));
         targetDevice.elements("TxPdo").forEach(pdo -> txPdos.add(prasePdo(pdo, "TxPdo")));
         targetDevice.elements("RxPdo").forEach(pdo -> rxPdos.add(prasePdo(pdo, "RxPdo")));
         excludePdo(rxPdos);
         excludePdo(txPdos);
-        return targetDevice.element("Type").getStringValue().replace("-","_");
+        return targetDevice.element("Type").getStringValue().replace("-", "_");
     }
 
-    public Element getTargetElement(String productCode, String revisionNo, String fliePath){
+    public Element getTargetElement(String name, String productCode, String revisionNo, String xmlFliesPath) {
         SAXReader saxReader = new SAXReader();
         Document doc = null;
-        try {
-            doc = saxReader.read(fliePath);
-        } catch (DocumentException e) {
-            System.out.println("NO FILE!");
-            throw new RuntimeException(e);
-        }
-        Element root = doc.getRootElement();
-        Element descriptions = root.element("Descriptions");
-        Element devices = descriptions.element("Devices");
-        for (Element device : devices.elements()) {
-            Element type = device.element("Type");
-            if (productCode.equals(type.attribute("ProductCode").getValue()) &&
-                    revisionNo.equals(type.attribute("RevisionNo").getValue())) {
-                return device;
+        File file = new File(xmlFliesPath);
+        File[] xmlFiles = file.listFiles();
+        assert xmlFiles != null;
+        for (File xmlFile : xmlFiles) {
+            try {
+                doc = saxReader.read(xmlFile);
+            } catch (DocumentException e) {
+                System.out.println("NO FILE!");
+                throw new RuntimeException(e);
+            }
+            Element root = doc.getRootElement();
+            Element descriptions = root.element("Descriptions");
+            Element devices = descriptions.element("Devices");
+            for (Element device : devices.elements()) {
+                Element type = device.element("Type");
+                List<Element> names = device.elements("Name");
+                boolean name_check = false;
+                for (Element element : names) {
+                    if (element.getStringValue().equals(name)) {
+                        name_check = true;
+                    }
+                }
+                if (productCode.equals(type.attribute("ProductCode").getValue()) &&
+                        revisionNo.equals(type.attribute("RevisionNo").getValue()) &&
+                        name_check) {
+                    return device;
+                }
             }
         }
+
         return null;
     }
 
@@ -61,7 +76,7 @@ public class MyPraser {
         }
         Pdo pdo = new Pdo();
         pdo.setIndex(pdoElement.element("Index").getStringValue().replace("#", "0"));
-        pdo.setName(pdoType+"_"+pdoElement.element("Name").getStringValue().replace(" ", "_"));
+        pdo.setName(pdoType + "_" + pdoElement.element("Name").getStringValue().replace(" ", "_"));
         pdo.setExclude(new ArrayList<>());
         pdo.setEntries(new ArrayList<>());
         for (Element exclude : pdoElement.elements("Exclude")) {

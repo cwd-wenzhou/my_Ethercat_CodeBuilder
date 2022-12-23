@@ -33,10 +33,11 @@ public class MyconfigAssembler {
             br = new BufferedReader(new FileReader(configCppPath));
             // 循环读取文件的每一行, 对需要修改的行进行修改, 放入缓冲对象中
             while ((line = br.readLine()) != null) {
-                // 此处修改某两处内容
-                if (line.equals(includeString)) {
+                //若已经引入了对应类，不需要再次插入
+                if (includeString.contains(line)) {
                     return;
                 }
+                // 此处修改某两处内容
                 if (line.startsWith("//Code-Builder include add here")) {
                     buf.append(includeString).append(line);
                 } else if (line.startsWith("//Code-Builder switch case add here")) {

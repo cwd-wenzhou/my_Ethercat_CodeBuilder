@@ -29,27 +29,16 @@ class MyEthercatCodeBuilderApplicationTests {
 
     @Test
     void contextLoads() throws IOException {
-//        String productCode = "#x01";
-//        String revisionNo = "#x00001";
-//        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-//                "Maxsine_EP3E_EC_V01_11.xml";
-
-
-//        String productCode = "#x03f03052";
-//        String revisionNo = "#x00110000";
-//        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-//                "Beckhoff EL1xxx.xml";
+        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls" ;
 
         String productCode = "#xbf83052";
         String revisionNo = "#x140000";
-        String xmlfilePath = "/home/imc/Documents/ethercat/my_Ethercat_CodeBuilder/src/main/resources/example/xmls/" +
-                        "Beckhoff EL30xx.xml";
-
+        String name = "EL3064 4K.Ana. Eingang 0-10V";
 
         List<Pdo> rxPdos = new ArrayList<>();
         List<Pdo> txPdos = new ArrayList<>();
         List<Direction> directions = new ArrayList<>();
-        String className = myPraser.prase(productCode, revisionNo, xmlfilePath, rxPdos, txPdos, directions);
+        String className = myPraser.prase(name,productCode, revisionNo, xmlfilePath, rxPdos, txPdos, directions);
 
         String source = myAssembler.assembleSource(className, rxPdos, txPdos,directions);
         String header = myAssembler.assembleHeader(className, rxPdos, txPdos,directions);
@@ -62,8 +51,8 @@ class MyEthercatCodeBuilderApplicationTests {
 
 
         myconfigAssembler.editConfigFile(configCppPath, productCode, className);
-//        System.out.println(source);
-//        System.out.println(header);
+        System.out.println(source);
+        System.out.println(header);
 
     }
 }
