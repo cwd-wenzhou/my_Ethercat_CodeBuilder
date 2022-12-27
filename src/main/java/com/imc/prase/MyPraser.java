@@ -31,7 +31,7 @@ public class MyPraser {
 
     public Element getTargetElement(String name, String productCode, String revisionNo, String xmlFliesPath) {
         SAXReader saxReader = new SAXReader();
-        Document doc = null;
+        Document doc;
         File file = new File(xmlFliesPath);
         File[] xmlFiles = file.listFiles();
         assert xmlFiles != null;

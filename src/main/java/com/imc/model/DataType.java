@@ -19,7 +19,7 @@ public enum DataType {
 
     USINT("USINT", "uint8_t", "EC_READ_U8", "EC_WRITE_U8"),
 
-    UINT("UINT", "uint16_t", "EC_READ_U8", "EC_WRITE_U16"),
+    UINT("UINT", "uint16_t", "EC_READ_U16", "EC_WRITE_U16"),
     UDINT("UDINT", "uint32_t", "EC_READ_U32", "EC_WRITE_U32"),
     ULINT("ULINT", "uint64_t", "EC_READ_U64", "EC_WRITE_U64"),
 
